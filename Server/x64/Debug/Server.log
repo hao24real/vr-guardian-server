@@ -1,0 +1,8 @@
+﻿  stdafx.cpp
+  Server.cpp
+Server.obj : error LNK2019: unresolved external symbol "private: static void __cdecl rpc::detail::dispatcher::enforce_arg_count(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &,unsigned __int64,unsigned __int64)" (?enforce_arg_count@dispatcher@detail@rpc@@CAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@_K1@Z) referenced in function "public: class std::unique_ptr<class clmdep_msgpack::v1::object_handle,struct std::default_delete<class clmdep_msgpack::v1::object_handle> > __cdecl <lambda_1a04d2792b2d1083e63e04cd9749599b>::operator()(struct clmdep_msgpack::v1::object const &)const " (??R<lambda_1a04d2792b2d1083e63e04cd9749599b>@@QEBA?AV?$unique_ptr@Vobject_handle@v1@clmdep_msgpack@@U?$default_delete@Vobject_handle@v1@clmdep_msgpack@@@std@@@std@@AEBUobject@v1@clmdep_msgpack@@@Z)
+Server.obj : error LNK2019: unresolved external symbol "public: __cdecl rpc::server::server(unsigned short)" (??0server@rpc@@QEAA@G@Z) referenced in function main
+Server.obj : error LNK2019: unresolved external symbol "public: __cdecl rpc::server::~server(void)" (??1server@rpc@@QEAA@XZ) referenced in function main
+Server.obj : error LNK2019: unresolved external symbol "public: void __cdecl rpc::server::run(void)" (?run@server@rpc@@QEAAXXZ) referenced in function main
+F:\Server\\rpclib\build\output\lib\Debug\rpc.lib : warning LNK4272: library machine type 'X86' conflicts with target machine type 'x64'
+F:\Server\x64\Debug\Server.exe : fatal error LNK1120: 4 unresolved externals
