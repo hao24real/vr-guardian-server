@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "rpc/client.h"
 #include "rpc/server.h"
 #include <iostream>
 #include <string>
@@ -10,36 +11,16 @@
 #include <array>
 using std::string;
 
-
 struct CMat4 {
-	std::array<float, 16> elements;
+	std::array<float, 16> elements = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1 };
 	MSGPACK_DEFINE_ARRAY(elements);
 };
 
-
-class GameState {
-
-	CMat4 model1;
-	CMat4 model2;
-public:
-
-	void setModel1(CMat4 model1)
-	{
-		this->model1 = model1;
-	}
-
-	void setModel2(CMat4 model2)
-	{
-		this->model2 = model2;
-	}
-	CMat4 getModel1() {
-		return this->model1;
-	}
-
-	CMat4 getModel2() {
-		return this->model2;
-	}
-
+struct GameState {
+	bool missileFlag = false, bulletFlag = false;
+	CMat4 vrModel;
+	CMat4 leapModel;
+	MSGPACK_DEFINE_ARRAY(missileFlag, bulletFlag, vrModel, leapModel);
 };
 
 
@@ -49,20 +30,26 @@ int main() {
 
 	GameState gameState;
 
-	srv.bind("setModel1", [&gameState](CMat4 input) {
-		gameState.setModel1(input);
+	srv.bind("updateGameState", [&gameState](int id, CMat4 input, bool flag) {
+		if (id == 1) {
+			gameState.vrModel = input;
+			gameState.bulletFlag = flag;
+		}
+		else {
+			gameState.leapModel = input;
+			gameState.missileFlag = flag;
+		}
 	});
 
-	srv.bind("setModel2", [&gameState](CMat4 input) {
-		gameState.setModel2(input);
-	});
-
-	srv.bind("getModel1", [&gameState]() {
-		return gameState.getModel1();
-	});
-
-	srv.bind("getModel2", [&gameState]() {
-		return gameState.getModel2();
+	srv.bind("getGameState", [&gameState](int id) {
+		GameState currState = gameState;
+		if (id == 1) {
+			gameState.missileFlag = false;
+		}
+		else {
+			gameState.bulletFlag = false;
+		}
+		return currState;
 	});
 
 	srv.run();
