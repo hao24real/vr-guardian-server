@@ -12,15 +12,22 @@
 using std::string;
 
 struct CMat4 {
-	std::array<float, 16> elements = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1 };
+	std::array<float, 16> elements = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 	MSGPACK_DEFINE_ARRAY(elements);
 };
 
 struct GameState {
 	bool missileFlag = false, bulletFlag = false;
-	CMat4 vrModel;
-	CMat4 leapModel;
-	MSGPACK_DEFINE_ARRAY(missileFlag, bulletFlag, vrModel, leapModel);
+
+	CMat4 vrHeadModel;
+	CMat4 vrBodyModel;
+	CMat4 vrGunModel;
+	
+	CMat4 leapLauncher;
+	CMat4 leapBody;
+
+	MSGPACK_DEFINE_ARRAY(missileFlag, bulletFlag, vrHeadModel,
+		vrBodyModel, vrGunModel, leapLauncher, leapBody);
 };
 
 
@@ -30,25 +37,30 @@ int main() {
 
 	GameState gameState;
 
-	srv.bind("updateGameState", [&gameState](int id, CMat4 input, bool flag) {
-		if (id == 1) {
-			gameState.vrModel = input;
-			gameState.bulletFlag = flag;
-		}
-		else {
-			gameState.leapModel = input;
-			gameState.missileFlag = flag;
-		}
+	srv.bind("updateVRGameState", [&gameState](CMat4 vrHeadModel, 
+		CMat4 vrBodyModel, CMat4 vrGunModel, bool bulletFlag) {
+		gameState.vrHeadModel = vrHeadModel;
+		gameState.vrBodyModel = vrBodyModel;
+		gameState.vrModel = vrGunModel;
+		gameState.bulletFlag = bulletFlag;
+
 	});
 
-	srv.bind("getGameState", [&gameState](int id) {
+	srv.bind("updateLeapGameState", [&gameState](CMat4 leapLauncher, CMat4 leapBody, bool missileFlag) {
+		gameState.leapModel = leapLauncher;
+		gameState.leapBody = leapBody;
+		gameState.missileFlag = missileFlag;
+	});
+
+	srv.bind("getVRGameState", [&gameState]() {
 		GameState currState = gameState;
-		if (id == 1) {
-			gameState.missileFlag = false;
-		}
-		else {
-			gameState.bulletFlag = false;
-		}
+		gameState.missileFlag = false;
+		return currState;
+	});
+
+	srv.bind("getLeapGameState", [&gameState](){
+		GameState currState = gameState;
+		gameState.bulletFlag = false;
 		return currState;
 	});
 
